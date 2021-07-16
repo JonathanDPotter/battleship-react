@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import App { state }from './App';
+import React from "react";
+import { render, screen } from "@testing-library/react"
+import App from "./App";
 
-test('renders learn react link', () => {
+test("renders double(2)", () => {
   render(<App />);
-  expect(state.thing).toBe(5);
-
+  expect(screen.getByText("4")).toBeInTheDocument();
 });

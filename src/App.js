@@ -6,8 +6,13 @@ class App extends Component {
     super(props);
     this.state = { thing: 5 };
   }
+
+  double(num) {
+    return num * 2;
+  }
+
   render() {
-  return <h2>Good</h2>
+  return <h2>{this.double(2)}</h2>
   }
 }
 
