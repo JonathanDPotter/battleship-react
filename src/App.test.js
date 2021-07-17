@@ -8,13 +8,6 @@ test("renders game title", () => {
   expect(screen.getByTestId("game-title").textContent).toBe("Battleship");
 });
 
-test("renders changeable text correctly after change", () => {
-  render(<App />);
-  expect(screen.getByTestId("changeable-text").textContent).toBe("boop");
-
-  // expect(screen.getByTestId("changeable-text").textContent).toBe("beep");
-});
-
 xtest("renders ship name when ships are being placed", () => {
   render(<App />);
   expect(screen.getByText("Aircraft Carrier")).toBeInTheDocument();
