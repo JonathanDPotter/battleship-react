@@ -4,16 +4,28 @@ import "./App.css";
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { thing: 5 };
+    this.state = { changeableText: "boop" };
+    this.changeText = this.changeText.bind(this);
   }
 
-  double(num) {
-    return num * 2;
-  }
+  changeText(string) {
+    console.log(string);
+  };
 
   render() {
-  return <h2>{this.double(2)}</h2>
+    return (
+      <div id="full-screen" className="full-screen">
+        <h1 data-testid="game-title" className="title">
+          {"Battleship"}
+        </h1>
+        <button className="title" onClick={this.changeText("beep")}>
+          change text
+        </button>
+        <h1 data-testid="changeable-text">{this.state.changeableText}</h1>
+      </div>
+    );
   }
 }
+
 
 export default App;
