@@ -1,0 +1,23 @@
+* {
+  margin: 0;
+  top: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#full-page {
+  width: 100%;
+}
+
+.board {
+  width: 28rem;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  .point {
+    height: 4rem;
+    width: 4rem;
+    text-align: center;
+    line-height: 4rem;
+    border: 1px solid black;
+  }
+}
