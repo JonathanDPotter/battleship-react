@@ -13,21 +13,23 @@ class App extends Component {
       placementOrientation: "h",
       shipsPlaced: false,
       shipPlaceCount: 0,
-      humAircraftCarrier: new Ship("Aircraft Carrier", 5),
-      humBattleShip: new Ship("Battleship", 4),
-      humCruiser: new Ship("Cruiser", 3),
-      humSubmarine: new Ship("Submarine", 3),
-      humDestroyer: new Ship("Destroyer", 2),
-      comAircraftCarrier: new Ship("Aircraft Carrier", 5),
-      comBattleShip: new Ship("Battleship", 4),
-      comCruiser: new Ship("Cruiser", 3),
-      comSubmarine: new Ship("Submarine", 3),
-      comDestroyer: new Ship("Destroyer", 2),
+      humAircraftCarrier: new Ship("Aircraft Carrier", 5, "a"),
+      humBattleShip: new Ship("Battleship", 4, "b"),
+      humCruiser: new Ship("Cruiser", 3, "c"),
+      humSubmarine: new Ship("Submarine", 3, "s"),
+      humDestroyer: new Ship("Destroyer", 2, "d"),
+      comAircraftCarrier: new Ship("Aircraft Carrier", 5, "a"),
+      comBattleShip: new Ship("Battleship", 4, "b"),
+      comCruiser: new Ship("Cruiser", 3, "c"),
+      comSubmarine: new Ship("Submarine", 3, "s"),
+      comDestroyer: new Ship("Destroyer", 2, "d"),
       comBoard: new Board("computer"),
       humBoard: new Board("human"),
     };
 
-    this.placeShip = this.placeShip.bind(this);
+    this.setup = this.setup.bind(this);
+    this.humBoardClick = this.humBoardClick.bind(this);
+    this.comBoardClick = this.comBoardClick.bind(this);
     this.toggleOrientation = this.toggleOrientation.bind(this);
   }
 
@@ -37,7 +39,15 @@ class App extends Component {
       : this.setState({ placementOrientation: "h" });
   }
 
-  placeShip() {
+  setup() {
+    const comShips = [
+      this.state.comAircraftCarrier,
+      this.state.comBattleShip,
+      this.state.comCruiser,
+      this.state.comSubmarine,
+      this.state.comDestroyer,
+    ];
+
     const humShips = [
       this.state.humAircraftCarrier,
       this.state.humBattleShip,
@@ -46,15 +56,45 @@ class App extends Component {
       this.state.humDestroyer,
     ];
 
-    this.setState({ currentShip: humShips[this.state.shipPlaceCount].name });
+    comShips.forEach((ship) => {
+      let placed = true;
+      do {
+        placed = this.state.comBoard.place(
+          Math.floor(Math.random() * 8),
+          Math.floor(Math.random() * 8),
+          Math.random() < 0.5 ? "h" : "v",
+          ship
+        );
+      } while (placed === false);
+    });
 
-    if (this.state.shipPlaceCount < 4) {
-      this.setState({ shipPlaceCount: this.state.shipPlaceCount + 1 });
-    }
+    this.setState({ currentShip: humShips[this.state.shipPlaceCount].name });
+  }
+
+  humBoardClick(event) {
+    const [y, z, x] = event.target.getAttribute("coord");
+    const { shipPlaceCount, humBoard, placementOrientation } = this.state;
+
+    const humShips = [
+      this.state.humAircraftCarrier,
+      this.state.humBattleShip,
+      this.state.humCruiser,
+      this.state.humSubmarine,
+      this.state.humDestroyer,
+    ];
+
+    if (shipPlaceCount < 5) {
+      console.log(y, z,  x);
+      humBoard.place(y, x, placementOrientation, humShips[shipPlaceCount]);
+    } 
+  }
+
+  comBoardClick(event) {
+    console.log(event.target.getAttribute("coord"));
   }
 
   componentDidMount() {
-    this.placeShip();
+    this.setup();
   }
 
   render() {
@@ -83,7 +123,12 @@ class App extends Component {
           {this.state.comBoard.points.map((row, i) => {
             return row.map((point, j) => {
               return (
-                <div className="point" key={[i, j]}>
+                <div
+                  className="point"
+                  key={[i, j]}
+                  coord={[i, j]}
+                  onClick={this.comBoardClick}
+                >
                   {point}
                 </div>
               );
@@ -97,7 +142,12 @@ class App extends Component {
           {this.state.humBoard.points.map((row, i) => {
             return row.map((point, j) => {
               return (
-                <div className="point" key={[i, j]}>
+                <div
+                  className="point"
+                  key={[i, j]}
+                  coord={[i, j]}
+                  onClick={this.humBoardClick}
+                >
                   {point}
                 </div>
               );

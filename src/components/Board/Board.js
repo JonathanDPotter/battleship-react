@@ -33,14 +33,14 @@ class Board {
     };
 
     this.place = (y, x, orient, ship) => {
-      const { length } = ship;
+      const { length, name } = ship;
       const checkPoints = [];
 
       // checks if placement is horizontal
       if (orient === "h") {
         // checks if Ship will fit on Board
         if (x + length > 9) {
-          console.log("horizontal won't fit");
+          console.log(`${name} horizontal won't fit`);
           return false;
         } else {
           for (let i = 0; i < length; i++) {
@@ -50,7 +50,7 @@ class Board {
 
         // checks if Ship will overlap another Ship
         if (!checkPoints.every((point) => point === 0)) {
-
+          console.log(`${name} horiz overlap`)
           return false;
         } else {
           // get a view of the points to be covered by Ship
@@ -64,7 +64,7 @@ class Board {
       } else {
         // checks if Ship will fit on Board
         if (y + length > 9) {
-          console.log("vertical won't fit");
+          console.log(`${name} vertical won't fit`);
           return false;
         } else {
           // get a view of the points to be covered by Ship
@@ -75,7 +75,7 @@ class Board {
 
         // checks if Ship will overlap another Ship
         if (!checkPoints.every((point) => point === 0)) {
-          console.log("vert overlap");
+          console.log(`${name} vert overlap`);
           return false;
         } else {
           for (let i = 0; i < length; i++) {
