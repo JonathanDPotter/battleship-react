@@ -86,6 +86,7 @@ class App extends Component {
     if (shipPlaceCount < 5) {
       console.log(y, z,  x);
       humBoard.place(y, x, placementOrientation, humShips[shipPlaceCount]);
+      console.table(humBoard.points);
     } 
   }
 

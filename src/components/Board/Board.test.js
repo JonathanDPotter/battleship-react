@@ -93,3 +93,32 @@ test("board won't place one ship on top of another", () => {
   expect(humBoard.place(2, 0, "h", submarine)).toBe(false);
   expect(humBoard.place(0, 0, "h", submarine)).toBe(true);
 });
+
+test("random placement of computer ships works", () => {
+  const comShips = [
+    new Ship("Aircraft Carrier", 5, "a"),
+    new Ship("Battleship", 4, "b"),
+    new Ship("Cruiser", 3, "c"),
+    new Ship("Submarine", 3, "s"),
+    new Ship("Destroyer", 2, "d"),
+  ];
+  const comBoard = new Board("computer");
+  let placedShips = 0;
+
+  comShips.forEach((ship) => {
+    let placed = true;
+    do {
+      placed = comBoard.place(
+        Math.floor(Math.random() * 8),
+        Math.floor(Math.random() * 8),
+        Math.random() < 0.5 ? "h" : "v",
+        ship
+      );
+      if (placed === true) {
+        placedShips = placedShips + 1;
+      }
+    } while (placed === false);
+  });
+
+  expect(placedShips).toBe(5);
+});
