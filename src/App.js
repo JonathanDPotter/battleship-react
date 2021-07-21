@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.scss";
 import Ship from "./components/Ship/Ship.js";
 import Board from "./components/Board/Board.js";
+import Player from "./components/Player/Player";
 
 class App extends Component {
   constructor(props) {
@@ -25,6 +26,9 @@ class App extends Component {
       comDestroyer: new Ship("Destroyer", 2, "d"),
       comBoard: new Board("computer"),
       humBoard: new Board("human"),
+      computer: new Player("computer"),
+      human: new Player("human"),
+      shotsFired: 0,
     };
 
     this.setup = this.setup.bind(this);
@@ -72,8 +76,9 @@ class App extends Component {
   }
 
   humBoardClick(event) {
-    const [y, z, x] = event.target.getAttribute("coord");
-    const { shipPlaceCount, humBoard, placementOrientation } = this.state;
+    const y = parseInt(event.target.getAttribute("coord")[0]),
+      x = parseInt(event.target.getAttribute("coord")[2]),
+      { shipPlaceCount, humBoard, placementOrientation } = this.state;
 
     const humShips = [
       this.state.humAircraftCarrier,
@@ -81,17 +86,25 @@ class App extends Component {
       this.state.humCruiser,
       this.state.humSubmarine,
       this.state.humDestroyer,
+      { name: "" },
     ];
 
     if (shipPlaceCount < 5) {
-      console.log(y, z,  x);
       humBoard.place(y, x, placementOrientation, humShips[shipPlaceCount]);
-      console.table(humBoard.points);
-    } 
+      this.setState({
+        shipPlaceCount: shipPlaceCount + 1,
+        currentShip: humShips[shipPlaceCount + 1].name,
+      });
+    }
   }
 
   comBoardClick(event) {
-    console.log(event.target.getAttribute("coord"));
+    const y = parseInt(event.target.getAttribute("coord")[0]),
+      x = parseInt(event.target.getAttribute("coord")[2]),
+      { comBoard, shotsFired } = this.state;
+
+    comBoard.target(y, x);
+    this.setState({ shotsFired: shotsFired + 1 });
   }
 
   componentDidMount() {
@@ -104,21 +117,30 @@ class App extends Component {
         <h1 id="game-title" className="title">
           {"Battleship"}
         </h1>
-        <h2 id="information" className="information">
-          Place {this.state.currentShip}{" "}
-          {this.state.placementOrientation === "h"
-            ? "Horizontally"
-            : "Vertically"}
-        </h2>
-        <button
-          id="orientation-toggle"
-          className="btn"
-          onClick={this.toggleOrientation}
-        >
-          Toggle Horiz/Vert
-        </button>
+        <div id="information" className="information">
+          {this.state.shipPlaceCount < 5 ? (
+            <h2>
+              Place {this.state.currentShip}{" "}
+              {this.state.placementOrientation === "h"
+                ? "Horizontally"
+                : "Vertically"}
+            </h2>
+          ) : (
+            <h2>Some other stuff.</h2>
+          )}
+        </div>
+        {this.state.shipPlaceCount < 5 ? (
+          <button
+            id="orientation-toggle"
+            className="btn"
+            onClick={this.toggleOrientation}
+          >
+            Toggle Horiz/Vert
+          </button>
+        ) : <div id="orientation-toggle"></div>
+        }
         <h2 id="com-board-name" className="board-name">
-          {this.state.comBoard.player}
+          {this.state.comBoard.player} board
         </h2>
         <div id="com-board" className="board">
           {this.state.comBoard.points.map((row, i) => {
@@ -137,7 +159,7 @@ class App extends Component {
           })}
         </div>
         <h2 id="hum-board-name" className="board-name">
-          {this.state.humBoard.player}
+          {this.state.humBoard.player} board
         </h2>
         <div id="hum-board" className="board">
           {this.state.humBoard.points.map((row, i) => {

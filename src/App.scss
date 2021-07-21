@@ -9,10 +9,19 @@
   width: 100%;
 }
 
+#orientation-toggle {
+  display: block;
+  height: 1.5rem;
+  .btn {
+    height: 1.5rem;
+  }
+}
+
 .board {
   width: 28rem;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  margin-bottom: 1rem;
   .point {
     height: 4rem;
     width: 4rem;

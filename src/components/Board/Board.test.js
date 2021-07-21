@@ -122,3 +122,21 @@ test("random placement of computer ships works", () => {
 
   expect(placedShips).toBe(5);
 });
+
+test("find points on two or more boards", () => {
+  const humSub = new Ship("Submarine", 3, "s"),
+    comSub = new Ship("Submarine", 3, "s"),
+    jerSub = new Ship("Submarine", 3, "s");
+
+  const humBoard = new Board("human"),
+    comBoard = new Board("computer"),
+    jerBoard = new Board("jerry");
+
+  humBoard.place(0, 0, "h", humSub);
+  comBoard.place(0, 0, "h", comSub);
+  jerBoard.place(0, 0, "h", jerSub);
+
+  expect(humBoard.points[0][0]).toBe("s0");
+  expect(comBoard.points[0][5]).toBe(0);
+  expect(jerBoard.points[0][0]).toBe("s0");
+});

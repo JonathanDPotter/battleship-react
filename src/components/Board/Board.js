@@ -35,7 +35,6 @@ class Board {
     this.place = (y, x, orient, ship) => {
       const { length, name } = ship;
       const checkPoints = [];
-      console.log(y, x, name, orient);
 
       // checks if placement is horizontal
       if (orient === "h") {
