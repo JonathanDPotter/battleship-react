@@ -29,12 +29,17 @@ class App extends Component {
       computer: new Player("computer"),
       human: new Player("human"),
       shotsFired: 0,
+      humShipsSunk: [],
+      comShipsSunk: [],
     };
 
     this.setup = this.setup.bind(this);
     this.humBoardClick = this.humBoardClick.bind(this);
     this.comBoardClick = this.comBoardClick.bind(this);
     this.toggleOrientation = this.toggleOrientation.bind(this);
+    this.comTurn = this.comTurn.bind(this);
+    this.tallySunkShip = this.tallySunkShip.bind(this);
+    this.fire = this.fire.bind(this);
   }
 
   toggleOrientation() {
@@ -90,21 +95,116 @@ class App extends Component {
     ];
 
     if (shipPlaceCount < 5) {
-      humBoard.place(y, x, placementOrientation, humShips[shipPlaceCount]);
-      this.setState({
-        shipPlaceCount: shipPlaceCount + 1,
-        currentShip: humShips[shipPlaceCount + 1].name,
-      });
+      if (
+        humBoard.place(y, x, placementOrientation, humShips[shipPlaceCount]) ===
+        true
+      ) {
+        this.setState({
+          shipPlaceCount: shipPlaceCount + 1,
+          currentShip: humShips[shipPlaceCount + 1].name,
+        });
+      }
     }
   }
 
   comBoardClick(event) {
     const y = parseInt(event.target.getAttribute("coord")[0]),
-      x = parseInt(event.target.getAttribute("coord")[2]),
-      { comBoard, shotsFired } = this.state;
+      x = parseInt(event.target.getAttribute("coord")[2]);
 
-    comBoard.target(y, x);
-    this.setState({ shotsFired: shotsFired + 1 });
+    this.fire(y, x, this.state.comBoard);
+    this.comTurn();
+  }
+
+  tallySunkShip(player, ship) {
+    player === "computer"
+      ? this.state.comShipsSunk.push(ship)
+      : this.state.humShipsSunk.push(ship);
+  }
+
+  comTurn() {
+    let success = true;
+    do {
+      success = this.fire(
+        Math.floor(Math.random() * 8),
+        Math.floor(Math.random() * 8),
+        this.state.humBoard
+      );
+    } while (success === false);
+  }
+
+  fire(y, x, board) {
+    let pointHit = false;
+
+    let aircraftCarrier, battleship, cruiser, submarine, destroyer;
+
+    if (board.name === "computer") {
+      aircraftCarrier = this.state.comAircraftCarrier;
+      battleship = this.state.comBattleShip;
+      cruiser = this.state.comCruiser;
+      submarine = this.state.comSubmarine;
+      destroyer = this.state.comDestroyer;
+    } else {
+      aircraftCarrier = this.state.humAircraftCarrier;
+      battleship = this.state.humBattleShip;
+      cruiser = this.state.humCruiser;
+      submarine = this.state.humSubmarine;
+      destroyer = this.state.humDestroyer;
+    }
+
+    if (board.points[y][x] === 1 || board.points[y][x] === 2) {
+      return false;
+    } else {
+      pointHit = board.target(y, x);
+
+      this.setState({ shotsFired: this.state.shotsFired + 1 });
+
+      if (pointHit !== 0) {
+        let shipId = pointHit.split("")[0];
+        let shipPoint = pointHit.split("")[1];
+        console.log(shipId, shipPoint);
+        switch (shipId) {
+          case "a":
+            aircraftCarrier.hit(shipPoint);
+            if (aircraftCarrier.isSunk()) {
+              console.log("Aircraft Carrier sunk!");
+              this.tallySunkShip(board.player, aircraftCarrier.name);
+            }
+            break;
+          case "b":
+            battleship.hit(shipPoint);
+            if (battleship.isSunk()) {
+              console.log("Battleship sunk!");
+              this.tallySunkShip(board.player, battleship.name);
+            }
+            break;
+          case "c":
+            cruiser.hit(shipPoint);
+            if (cruiser.isSunk()) {
+              console.log("Cruiser sunk!");
+              this.tallySunkShip(board.player, cruiser.name);
+            }
+            break;
+          case "d":
+            destroyer.hit(shipPoint);
+            if (destroyer.isSunk()) {
+              console.log("Destroyer sunk!");
+              this.tallySunkShip(board.player, destroyer.name);
+            }
+            break;
+          case "s":
+            submarine.hit(shipPoint);
+            if (submarine.isSunk()) {
+              console.log("Submarine sunk!");
+              this.tallySunkShip(board.player, submarine.name);
+            }
+            break;
+          default:
+            console.log("Some kind of error.");
+            break;
+        }
+      }
+      return true;
+    }
   }
 
   componentDidMount() {
@@ -126,7 +226,7 @@ class App extends Component {
                 : "Vertically"}
             </h2>
           ) : (
-            <h2>Some other stuff.</h2>
+            <h2>Choose a target.</h2>
           )}
         </div>
         {this.state.shipPlaceCount < 5 ? (
@@ -137,45 +237,68 @@ class App extends Component {
           >
             Toggle Horiz/Vert
           </button>
-        ) : <div id="orientation-toggle"></div>
-        }
+        ) : (
+          <div id="orientation-toggle"></div>
+        )}
         <h2 id="com-board-name" className="board-name">
           {this.state.comBoard.player} board
         </h2>
-        <div id="com-board" className="board">
-          {this.state.comBoard.points.map((row, i) => {
-            return row.map((point, j) => {
+        <div id="com-board-container" className="board-container">
+          <div id="com-board" className="board">
+            {this.state.comBoard.points.map((row, i) => {
+              return row.map((point, j) => {
+                return (
+                  <div
+                    className="point"
+                    key={[i, j]}
+                    coord={[i, j]}
+                    onClick={this.comBoardClick}
+                  >
+                    {point}
+                  </div>
+                );
+              });
+            })}
+          </div>
+          <div id="com-ships-sunk" className="ships-sunk">
+            {this.state.comShipsSunk.map((ship) => {
               return (
-                <div
-                  className="point"
-                  key={[i, j]}
-                  coord={[i, j]}
-                  onClick={this.comBoardClick}
-                >
-                  {point}
-                </div>
+                <h3 className="sunk-ship" key={ship + "com"}>
+                  {ship} sunk!
+                </h3>
               );
-            });
-          })}
+            })}
+          </div>
         </div>
         <h2 id="hum-board-name" className="board-name">
           {this.state.humBoard.player} board
         </h2>
-        <div id="hum-board" className="board">
-          {this.state.humBoard.points.map((row, i) => {
-            return row.map((point, j) => {
+        <div className="board-container" id="hum-board-container">
+          <div id="hum-board" className="board">
+            {this.state.humBoard.points.map((row, i) => {
+              return row.map((point, j) => {
+                return (
+                  <div
+                    className="point"
+                    key={[i, j]}
+                    coord={[i, j]}
+                    onClick={this.humBoardClick}
+                  >
+                    {point}
+                  </div>
+                );
+              });
+            })}
+          </div>
+          <div id="hum-ships-sunk" className="ships-sunk">
+            {this.state.humShipsSunk.map((ship) => {
               return (
-                <div
-                  className="point"
-                  key={[i, j]}
-                  coord={[i, j]}
-                  onClick={this.humBoardClick}
-                >
-                  {point}
-                </div>
+                <h3 className="sunk-ship" key={ship + "hum"}>
+                  {ship} sunk!
+                </h3>
               );
-            });
-          })}
+            })}
+          </div>
         </div>
       </div>
     );

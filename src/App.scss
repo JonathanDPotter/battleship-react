@@ -16,17 +16,25 @@
     height: 1.5rem;
   }
 }
+.board-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  .board {
+    width: 28rem;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    margin-bottom: 1rem;
+    .point {
+      height: 4rem;
+      width: 4rem;
+      text-align: center;
+      line-height: 4rem;
+      border: 1px solid black;
+    }
+  }
 
-.board {
-  width: 28rem;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  margin-bottom: 1rem;
-  .point {
-    height: 4rem;
-    width: 4rem;
-    text-align: center;
-    line-height: 4rem;
-    border: 1px solid black;
+  .ships-sunk {
+    height: 28rem;
   }
 }
