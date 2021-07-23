@@ -31,6 +31,7 @@ class App extends Component {
       shotsFired: 0,
       humShipsSunk: [],
       comShipsSunk: [],
+      message: "Choose a target.",
     };
 
     this.setup = this.setup.bind(this);
@@ -40,6 +41,7 @@ class App extends Component {
     this.comTurn = this.comTurn.bind(this);
     this.tallySunkShip = this.tallySunkShip.bind(this);
     this.fire = this.fire.bind(this);
+    this.winner = this.winner.bind(this);
   }
 
   toggleOrientation() {
@@ -83,14 +85,23 @@ class App extends Component {
   humBoardClick(event) {
     const y = parseInt(event.target.getAttribute("coord")[0]),
       x = parseInt(event.target.getAttribute("coord")[2]),
-      { shipPlaceCount, humBoard, placementOrientation } = this.state;
+      {
+        shipPlaceCount,
+        humBoard,
+        placementOrientation,
+        humAircraftCarrier,
+        humBattleShip,
+        humCruiser,
+        humSubmarine,
+        humDestroyer,
+      } = this.state;
 
     const humShips = [
-      this.state.humAircraftCarrier,
-      this.state.humBattleShip,
-      this.state.humCruiser,
-      this.state.humSubmarine,
-      this.state.humDestroyer,
+      humAircraftCarrier,
+      humBattleShip,
+      humCruiser,
+      humSubmarine,
+      humDestroyer,
       { name: "" },
     ];
 
@@ -111,45 +122,85 @@ class App extends Component {
     const y = parseInt(event.target.getAttribute("coord")[0]),
       x = parseInt(event.target.getAttribute("coord")[2]);
 
-    this.fire(y, x, this.state.comBoard);
-    this.comTurn();
+    const {
+      comAircraftCarrier,
+      comBattleShip,
+      comCruiser,
+      comSubmarine,
+      comDestroyer,
+    } = this.state;
+
+    this.fire(
+      y,
+      x,
+      this.state.comBoard,
+      comAircraftCarrier,
+      comBattleShip,
+      comCruiser,
+      comSubmarine,
+      comDestroyer
+    );
+    this.setState({ message: "Computer turn" });
+    setTimeout(() => {
+      this.comTurn();
+    }, 1000);
   }
 
   tallySunkShip(player, ship) {
-    player === "computer"
-      ? this.state.comShipsSunk.push(ship)
-      : this.state.humShipsSunk.push(ship);
+    const { comShipsSunk, humShipsSunk, human, computer } = this.state;
+
+    if (player === "computer") {
+      comShipsSunk.push(ship);
+      human.sunkShip();
+      if (human.hasWon() === true) {
+        this.winner(human);
+      }
+    } else {
+      humShipsSunk.push(ship);
+      computer.sunkShip();
+      if (computer.hasWon() === true) {
+        this.winner(computer);
+      }
+    }
   }
 
   comTurn() {
+    const {
+      humBoard,
+      humAircraftCarrier,
+      humBattleShip,
+      humCruiser,
+      humSubmarine,
+      humDestroyer,
+    } = this.state;
+
     let success = true;
     do {
       success = this.fire(
         Math.floor(Math.random() * 8),
         Math.floor(Math.random() * 8),
-        this.state.humBoard
+        humBoard,
+        humAircraftCarrier,
+        humBattleShip,
+        humCruiser,
+        humSubmarine,
+        humDestroyer
       );
     } while (success === false);
+    this.setState({ message: "Choose a target." });
   }
 
-  fire(y, x, board) {
+  fire(
+    y,
+    x,
+    board,
+    aircraftCarrier,
+    battleship,
+    cruiser,
+    submarine,
+    destroyer
+  ) {
     let pointHit = false;
-
-    let aircraftCarrier, battleship, cruiser, submarine, destroyer;
-
-    if (board.name === "computer") {
-      aircraftCarrier = this.state.comAircraftCarrier;
-      battleship = this.state.comBattleShip;
-      cruiser = this.state.comCruiser;
-      submarine = this.state.comSubmarine;
-      destroyer = this.state.comDestroyer;
-    } else {
-      aircraftCarrier = this.state.humAircraftCarrier;
-      battleship = this.state.humBattleShip;
-      cruiser = this.state.humCruiser;
-      submarine = this.state.humSubmarine;
-      destroyer = this.state.humDestroyer;
-    }
 
     if (board.points[y][x] === 1 || board.points[y][x] === 2) {
       return false;
@@ -207,6 +258,12 @@ class App extends Component {
     }
   }
 
+  winner(player) {
+    player.name === "computer"
+      ? this.setState({ message: "Computer wins!" })
+      : this.setState({ message: "Human wins!" });
+  }
+
   componentDidMount() {
     this.setup();
   }
@@ -226,7 +283,7 @@ class App extends Component {
                 : "Vertically"}
             </h2>
           ) : (
-            <h2>Choose a target.</h2>
+            <h2>{this.state.message}</h2>
           )}
         </div>
         {this.state.shipPlaceCount < 5 ? (
@@ -254,7 +311,7 @@ class App extends Component {
                     coord={[i, j]}
                     onClick={this.comBoardClick}
                   >
-                    {point}
+                    {point !== 1 && point !== 2 ? 0 : point}
                   </div>
                 );
               });
