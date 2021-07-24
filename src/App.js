@@ -3,6 +3,8 @@ import "./App.scss";
 import Ship from "./components/Ship/Ship.js";
 import Board from "./components/Board/Board.js";
 import Player from "./components/Player/Player";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFireAlt, faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 
 class App extends Component {
   constructor(props) {
@@ -42,6 +44,7 @@ class App extends Component {
     this.tallySunkShip = this.tallySunkShip.bind(this);
     this.fire = this.fire.bind(this);
     this.winner = this.winner.bind(this);
+    this.showResult = this.showResult.bind(this);
   }
 
   toggleOrientation() {
@@ -120,7 +123,8 @@ class App extends Component {
 
   comBoardClick(event) {
     const y = parseInt(event.target.getAttribute("coord")[0]),
-      x = parseInt(event.target.getAttribute("coord")[2]);
+      x = parseInt(event.target.getAttribute("coord")[2]),
+      comBoardContainer = document.getElementById("com-board-container");
 
     const {
       comAircraftCarrier,
@@ -141,9 +145,11 @@ class App extends Component {
       comDestroyer
     );
     this.setState({ message: "Computer turn" });
+    comBoardContainer.classList.add("unclickable");
     setTimeout(() => {
       this.comTurn();
-    }, 1000);
+      comBoardContainer.classList.remove("unclickable");
+    }, 500);
   }
 
   tallySunkShip(player, ship) {
@@ -264,6 +270,17 @@ class App extends Component {
       : this.setState({ message: "Human wins!" });
   }
 
+  showResult(point) {
+    if (point === 2) {
+      return <FontAwesomeIcon icon={faFireAlt} className="fire" size="2x" />;
+    }
+    if (point === 1) {
+      return (
+        <FontAwesomeIcon icon={faCrosshairs} className="crosshairs" size="2x" />
+      );
+    }
+  }
+
   componentDidMount() {
     this.setup();
   }
@@ -311,7 +328,7 @@ class App extends Component {
                     coord={[i, j]}
                     onClick={this.comBoardClick}
                   >
-                    {point !== 1 && point !== 2 ? 0 : point}
+                    {this.showResult(point)}
                   </div>
                 );
               });
@@ -341,7 +358,7 @@ class App extends Component {
                     coord={[i, j]}
                     onClick={this.humBoardClick}
                   >
-                    {point}
+                    {this.showResult(point)}
                   </div>
                 );
               });
@@ -357,6 +374,13 @@ class App extends Component {
             })}
           </div>
         </div>
+        <p id="attribution" className="attribution">
+          Ship icons are from
+          <sp> </sp>
+          <a href="https://www.freevector.com/military-ships#">
+            FreeVector.com
+          </a>
+        </p>
       </div>
     );
   }
