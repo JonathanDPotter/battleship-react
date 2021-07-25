@@ -34,6 +34,7 @@ class App extends Component {
       humShipsSunk: [],
       comShipsSunk: [],
       message: "Choose a target.",
+      gameOver: false,
     };
 
     this.setup = this.setup.bind(this);
@@ -144,6 +145,7 @@ class App extends Component {
       comSubmarine,
       comDestroyer
     );
+
     this.setState({ message: "Computer turn" });
     comBoardContainer.classList.add("unclickable");
     setTimeout(() => {
@@ -266,8 +268,8 @@ class App extends Component {
 
   winner(player) {
     player.name === "computer"
-      ? this.setState({ message: "Computer wins!" })
-      : this.setState({ message: "Human wins!" });
+      ? this.setState({ winner: "Computer", gameOver: true })
+      : this.setState({ winner: "Human", gameOver: true });
   }
 
   showResult(point) {
@@ -281,6 +283,10 @@ class App extends Component {
     }
   }
 
+  refresh() {
+    window.location.reload();
+  }
+
   componentDidMount() {
     this.setup();
   }
@@ -291,96 +297,100 @@ class App extends Component {
         <h1 id="game-title" className="title">
           {"Battleship"}
         </h1>
-        <div id="information" className="information">
-          {this.state.shipPlaceCount < 5 ? (
-            <h2>
-              Place {this.state.currentShip}{" "}
-              {this.state.placementOrientation === "h"
-                ? "Horizontally"
-                : "Vertically"}
+        {this.state.gameOver === false ? (
+          <div id="main-display" className="main-display">
+            <div id="information" className="information">
+              {this.state.shipPlaceCount < 5 ? (
+                <h2>
+                  Place {this.state.currentShip}{" "}
+                  {this.state.placementOrientation === "h"
+                    ? "Horizontally"
+                    : "Vertically"}
+                </h2>
+              ) : (
+                <h2>{this.state.message}</h2>
+              )}
+            </div>
+            {this.state.shipPlaceCount < 5 ? (
+              <button
+                id="orientation-toggle"
+                className="btn"
+                onClick={this.toggleOrientation}
+              >
+                Toggle Horiz/Vert
+              </button>
+            ) : (
+              <div id="orientation-toggle"></div>
+            )}
+            <h2 id="com-board-name" className="board-name">
+              {this.state.comBoard.player} board
             </h2>
-          ) : (
-            <h2>{this.state.message}</h2>
-          )}
-        </div>
-        {this.state.shipPlaceCount < 5 ? (
-          <button
-            id="orientation-toggle"
-            className="btn"
-            onClick={this.toggleOrientation}
-          >
-            Toggle Horiz/Vert
-          </button>
+            <div id="com-board-container" className="board-container">
+              <div id="com-board" className="board">
+                {this.state.comBoard.points.map((row, i) => {
+                  return row.map((point, j) => {
+                    return (
+                      <div
+                        className="point"
+                        key={[i, j]}
+                        coord={[i, j]}
+                        onClick={this.comBoardClick}
+                      >
+                        {this.showResult(point)}
+                      </div>
+                    );
+                  });
+                })}
+              </div>
+              <div id="com-ships-sunk" className="ships-sunk">
+                {this.state.comShipsSunk.map((ship) => {
+                  return (
+                    <h3 className="sunk-ship" key={ship + "com"}>
+                      {ship} sunk!
+                    </h3>
+                  );
+                })}
+              </div>
+            </div>
+            <h2 id="hum-board-name" className="board-name">
+              {this.state.humBoard.player} board
+            </h2>
+            <div className="board-container" id="hum-board-container">
+              <div id="hum-board" className="board">
+                {this.state.humBoard.points.map((row, i) => {
+                  return row.map((point, j) => {
+                    return (
+                      <div
+                        className="point"
+                        key={[i, j]}
+                        coord={[i, j]}
+                        onClick={this.humBoardClick}
+                      >
+                        {this.showResult(point)}
+                      </div>
+                    );
+                  });
+                })}
+              </div>
+              <div id="hum-ships-sunk" className="ships-sunk">
+                {this.state.humShipsSunk.map((ship) => {
+                  return (
+                    <h3 className="sunk-ship" key={ship + "hum"}>
+                      {ship} sunk!
+                    </h3>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         ) : (
-          <div id="orientation-toggle"></div>
+          <div id="winner-message" className="winner-message">
+            <h1 id="winner" className="winner">
+              {`${this.state.winner} has won!`}
+              </h1>
+              <button id="play-again" className="btn" onClick={() => this.refresh()}>play again</button>
+          </div>
         )}
-        <h2 id="com-board-name" className="board-name">
-          {this.state.comBoard.player} board
-        </h2>
-        <div id="com-board-container" className="board-container">
-          <div id="com-board" className="board">
-            {this.state.comBoard.points.map((row, i) => {
-              return row.map((point, j) => {
-                return (
-                  <div
-                    className="point"
-                    key={[i, j]}
-                    coord={[i, j]}
-                    onClick={this.comBoardClick}
-                  >
-                    {this.showResult(point)}
-                  </div>
-                );
-              });
-            })}
-          </div>
-          <div id="com-ships-sunk" className="ships-sunk">
-            {this.state.comShipsSunk.map((ship) => {
-              return (
-                <h3 className="sunk-ship" key={ship + "com"}>
-                  {ship} sunk!
-                </h3>
-              );
-            })}
-          </div>
-        </div>
-        <h2 id="hum-board-name" className="board-name">
-          {this.state.humBoard.player} board
-        </h2>
-        <div className="board-container" id="hum-board-container">
-          <div id="hum-board" className="board">
-            {this.state.humBoard.points.map((row, i) => {
-              return row.map((point, j) => {
-                return (
-                  <div
-                    className="point"
-                    key={[i, j]}
-                    coord={[i, j]}
-                    onClick={this.humBoardClick}
-                  >
-                    {this.showResult(point)}
-                  </div>
-                );
-              });
-            })}
-          </div>
-          <div id="hum-ships-sunk" className="ships-sunk">
-            {this.state.humShipsSunk.map((ship) => {
-              return (
-                <h3 className="sunk-ship" key={ship + "hum"}>
-                  {ship} sunk!
-                </h3>
-              );
-            })}
-          </div>
-        </div>
-        <p id="attribution" className="attribution">
-          Ship icons are from
-          <sp> </sp>
-          <a href="https://www.freevector.com/military-ships#">
-            FreeVector.com
-          </a>
-        </p>
       </div>
     );
   }
