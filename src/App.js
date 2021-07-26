@@ -275,8 +275,7 @@ class App extends Component {
   showResult(point) {
     if (point === 2) {
       return <FontAwesomeIcon icon={faFireAlt} className="fire" size="2x" />;
-    }
-    if (point === 1) {
+    } else if (point === 1) {
       return (
         <FontAwesomeIcon icon={faCrosshairs} className="crosshairs" size="2x" />
       );
@@ -343,6 +342,9 @@ class App extends Component {
                 })}
               </div>
               <div id="com-ships-sunk" className="ships-sunk">
+                <h3 id="sunk-ship-title" className="sunk-ship">
+                  Ships Sunk
+                </h3>
                 {this.state.comShipsSunk.map((ship) => {
                   return (
                     <h3 className="sunk-ship" key={ship + "com"}>
@@ -361,7 +363,11 @@ class App extends Component {
                   return row.map((point, j) => {
                     return (
                       <div
-                        className="point"
+                        className={
+                          point !== 1 && point !== 2 && point !== 0
+                            ? "point ship"
+                            : "point"
+                        }
                         key={[i, j]}
                         coord={[i, j]}
                         onClick={this.humBoardClick}
@@ -373,6 +379,9 @@ class App extends Component {
                 })}
               </div>
               <div id="hum-ships-sunk" className="ships-sunk">
+                <h3 id="sunk-ship-title" className="sunk-ship">
+                  Ships Sunk
+                </h3>
                 {this.state.humShipsSunk.map((ship) => {
                   return (
                     <h3 className="sunk-ship" key={ship + "hum"}>
@@ -387,8 +396,14 @@ class App extends Component {
           <div id="winner-message" className="winner-message">
             <h1 id="winner" className="winner">
               {`${this.state.winner} has won!`}
-              </h1>
-              <button id="play-again" className="btn" onClick={() => this.refresh()}>play again</button>
+            </h1>
+            <button
+              id="play-again"
+              className="btn"
+              onClick={() => this.refresh()}
+            >
+              play again
+            </button>
           </div>
         )}
       </div>

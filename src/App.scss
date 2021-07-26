@@ -39,7 +39,14 @@
   }
 
   .ships-sunk {
+    text-align: center;
     height: 24rem;
+    width: 20rem;
+    border: 1px solid black;
+    border-radius: 5px;
+    .sunk-ship {
+      margin-top: 1rem;
+    }
   }
 }
 
@@ -62,4 +69,8 @@
 
 .unclickable {
   pointer-events: none;
+}
+
+.ship {
+  background-color: gray !important;
 }
