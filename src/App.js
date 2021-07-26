@@ -146,6 +146,8 @@ class App extends Component {
       comDestroyer
     );
 
+    event.target.classList.add("unclickable");
+
     this.setState({ message: "Computer turn" });
     comBoardContainer.classList.add("unclickable");
     setTimeout(() => {
@@ -274,10 +276,10 @@ class App extends Component {
 
   showResult(point) {
     if (point === 2) {
-      return <FontAwesomeIcon icon={faFireAlt} className="fire" size="2x" />;
+      return <FontAwesomeIcon icon={faFireAlt} className="fire icon" size="2x" />;
     } else if (point === 1) {
       return (
-        <FontAwesomeIcon icon={faCrosshairs} className="crosshairs" size="2x" />
+        <FontAwesomeIcon icon={faCrosshairs} className="crosshairs icon" size="2x" />
       );
     }
   }
@@ -321,74 +323,83 @@ class App extends Component {
             ) : (
               <div id="orientation-toggle"></div>
             )}
-            <h2 id="com-board-name" className="board-name">
-              {this.state.comBoard.player} board
-            </h2>
-            <div id="com-board-container" className="board-container">
-              <div id="com-board" className="board">
-                {this.state.comBoard.points.map((row, i) => {
-                  return row.map((point, j) => {
-                    return (
-                      <div
-                        className="point"
-                        key={[i, j]}
-                        coord={[i, j]}
-                        onClick={this.comBoardClick}
-                      >
-                        {this.showResult(point)}
-                      </div>
-                    );
-                  });
-                })}
-              </div>
-              <div id="com-ships-sunk" className="ships-sunk">
-                <h3 id="sunk-ship-title" className="sunk-ship">
-                  Ships Sunk
-                </h3>
-                {this.state.comShipsSunk.map((ship) => {
-                  return (
-                    <h3 className="sunk-ship" key={ship + "com"}>
-                      {ship} sunk!
+            {this.state.shipPlaceCount === 5 ? (
+              <div id="com-board-container" className="board-container">
+                <h2 id="com-board-name" className="board-name">
+                  {this.state.comBoard.player} board
+                </h2>
+                <div
+                  id="sub-com-board-container"
+                  className="sub-board-container"
+                >
+                  <div id="com-board" className="board">
+                    {this.state.comBoard.points.map((row, i) => {
+                      return row.map((point, j) => {
+                        return (
+                          <div
+                            className="point"
+                            key={[i, j]}
+                            coord={[i, j]}
+                            onClick={this.comBoardClick}
+                          >
+                            {this.showResult(point)}
+                          </div>
+                        );
+                      });
+                    })}
+                  </div>
+                  <div id="com-ships-sunk" className="ships-sunk">
+                    <h3 id="sunk-ship-title" className="sunk-ship">
+                      Ships Sunk
                     </h3>
-                  );
-                })}
+                    {this.state.comShipsSunk.map((ship) => {
+                      return (
+                        <h3 className="sunk-ship" key={ship + "com"}>
+                          {ship} sunk!
+                        </h3>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-            <h2 id="hum-board-name" className="board-name">
-              {this.state.humBoard.player} board
-            </h2>
+            ) : null}
             <div className="board-container" id="hum-board-container">
-              <div id="hum-board" className="board">
-                {this.state.humBoard.points.map((row, i) => {
-                  return row.map((point, j) => {
+              <h2 id="hum-board-name" className="board-name">
+                {this.state.humBoard.player} board
+              </h2>
+              <div id="sub-hum-board-container" className="sub-board-container">
+                <div id="hum-board" className="board">
+                  {this.state.humBoard.points.map((row, i) => {
+                    return row.map((point, j) => {
+                      return (
+                        <div
+                          className={
+                            point !== 1 && point !== 2 && point !== 0
+                              ? "point ship"
+                              : "point"
+                          }
+                          key={[i, j]}
+                          coord={[i, j]}
+                          onClick={this.humBoardClick}
+                        >
+                          {this.showResult(point)}
+                        </div>
+                      );
+                    });
+                  })}
+                </div>
+                <div id="hum-ships-sunk" className="ships-sunk">
+                  <h3 id="sunk-ship-title" className="sunk-ship">
+                    Ships Sunk
+                  </h3>
+                  {this.state.humShipsSunk.map((ship) => {
                     return (
-                      <div
-                        className={
-                          point !== 1 && point !== 2 && point !== 0
-                            ? "point ship"
-                            : "point"
-                        }
-                        key={[i, j]}
-                        coord={[i, j]}
-                        onClick={this.humBoardClick}
-                      >
-                        {this.showResult(point)}
-                      </div>
+                      <h3 className="sunk-ship" key={ship + "hum"}>
+                        {ship} sunk!
+                      </h3>
                     );
-                  });
-                })}
-              </div>
-              <div id="hum-ships-sunk" className="ships-sunk">
-                <h3 id="sunk-ship-title" className="sunk-ship">
-                  Ships Sunk
-                </h3>
-                {this.state.humShipsSunk.map((ship) => {
-                  return (
-                    <h3 className="sunk-ship" key={ship + "hum"}>
-                      {ship} sunk!
-                    </h3>
-                  );
-                })}
+                  })}
+                </div>
               </div>
             </div>
           </div>
