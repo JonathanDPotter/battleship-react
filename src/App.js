@@ -11,7 +11,6 @@ class App extends Component {
     super(props);
 
     this.state = {
-      changeableText: "boop",
       currentShip: "",
       placementOrientation: "h",
       shipsPlaced: false,
@@ -159,15 +158,26 @@ class App extends Component {
   tallySunkShip(player, ship) {
     const { comShipsSunk, humShipsSunk, human, computer } = this.state;
 
+    const humShipsSunkDisplay = document.getElementById("hum-ships-sunk"),
+      comShipsSunkDisplay = document.getElementById("com-ships-sunk");
+
     if (player === "computer") {
       comShipsSunk.push(ship);
       human.sunkShip();
+      comShipsSunkDisplay.classList.add("jiggle");
+      window.setTimeout(() => {
+        comShipsSunkDisplay.classList.remove("jiggle");
+      }, 1000);
       if (human.hasWon() === true) {
         this.winner(human);
       }
     } else {
       humShipsSunk.push(ship);
       computer.sunkShip();
+      humShipsSunkDisplay.classList.add("jiggle");
+      window.setTimeout(() => {
+        humShipsSunkDisplay.classList.remove("jiggle");
+      }, 1000);
       if (computer.hasWon() === true) {
         this.winner(computer);
       }
@@ -185,18 +195,20 @@ class App extends Component {
     } = this.state;
 
     let success = true;
-    do {
-      success = this.fire(
-        Math.floor(Math.random() * 8),
-        Math.floor(Math.random() * 8),
-        humBoard,
-        humAircraftCarrier,
-        humBattleShip,
-        humCruiser,
-        humSubmarine,
-        humDestroyer
-      );
-    } while (success === false);
+    if (this.state.gameOver === false) {
+      do {
+        success = this.fire(
+          Math.floor(Math.random() * 8),
+          Math.floor(Math.random() * 8),
+          humBoard,
+          humAircraftCarrier,
+          humBattleShip,
+          humCruiser,
+          humSubmarine,
+          humDestroyer
+        );
+      } while (success === false);
+    }
     this.setState({ message: "Choose a target." });
   }
 
@@ -269,17 +281,27 @@ class App extends Component {
   }
 
   winner(player) {
+    const winnerMessage = document.getElementById("winner-message");
+
     player.name === "computer"
       ? this.setState({ winner: "Computer", gameOver: true })
       : this.setState({ winner: "Human", gameOver: true });
+
+    winnerMessage.classList.add("fade-in");
   }
 
   showResult(point) {
     if (point === 2) {
-      return <FontAwesomeIcon icon={faFireAlt} className="fire icon" size="2x" />;
+      return (
+        <FontAwesomeIcon icon={faFireAlt} className="fire icon" size="2x" />
+      );
     } else if (point === 1) {
       return (
-        <FontAwesomeIcon icon={faCrosshairs} className="crosshairs icon" size="2x" />
+        <FontAwesomeIcon
+          icon={faCrosshairs}
+          className="crosshairs icon"
+          size="2x"
+        />
       );
     }
   }
@@ -299,7 +321,14 @@ class App extends Component {
           {"Battleship"}
         </h1>
         {this.state.gameOver === false ? (
-          <div id="main-display" className="main-display">
+          <div
+            id="main-display"
+            className={
+              this.state.shipPlaceCount === 5
+                ? "fade-in main-display"
+                : "main-display"
+            }
+          >
             <div id="information" className="information">
               {this.state.shipPlaceCount < 5 ? (
                 <h2>
@@ -365,7 +394,9 @@ class App extends Component {
             ) : null}
             <div className="board-container" id="hum-board-container">
               <h2 id="hum-board-name" className="board-name">
-                {this.state.humBoard.player} board
+                {this.state.shipPlaceCount === 5
+                  ? `${this.state.humBoard.player} board`
+                  : null}
               </h2>
               <div id="sub-hum-board-container" className="sub-board-container">
                 <div id="hum-board" className="board">
@@ -388,18 +419,20 @@ class App extends Component {
                     });
                   })}
                 </div>
-                <div id="hum-ships-sunk" className="ships-sunk">
-                  <h3 id="sunk-ship-title" className="sunk-ship">
-                    Ships Sunk
-                  </h3>
-                  {this.state.humShipsSunk.map((ship) => {
-                    return (
-                      <h3 className="sunk-ship" key={ship + "hum"}>
-                        {ship} sunk!
-                      </h3>
-                    );
-                  })}
-                </div>
+                {this.state.shipPlaceCount === 5 ? (
+                  <div id="hum-ships-sunk" className="ships-sunk">
+                    <h3 id="sunk-ship-title" className="sunk-ship">
+                      Ships Sunk
+                    </h3>
+                    {this.state.humShipsSunk.map((ship) => {
+                      return (
+                        <h3 className="sunk-ship" key={ship + "hum"}>
+                          {ship} sunk!
+                        </h3>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
