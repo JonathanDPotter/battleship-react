@@ -284,10 +284,14 @@ class App extends Component {
     const winnerMessage = document.getElementById("winner-message");
 
     player.name === "computer"
-      ? this.setState({ winner: "Computer", gameOver: true })
-      : this.setState({ winner: "Human", gameOver: true });
-
-    winnerMessage.classList.add("fade-in");
+      ? this.setState(
+          { winner: "Computer", gameOver: true },
+          () => (winnerMessage.className = "winner-message fade-in grow")
+        )
+      : this.setState(
+          { winner: "Human", gameOver: true },
+          () => (winnerMessage.className = "winner-message fade-in grow")
+        );
   }
 
   showResult(point) {
@@ -436,20 +440,19 @@ class App extends Component {
               </div>
             </div>
           </div>
-        ) : (
-          <div id="winner-message" className="winner-message">
-            <h1 id="winner" className="winner">
-              {`${this.state.winner} has won!`}
-            </h1>
-            <button
-              id="play-again"
-              className="btn"
-              onClick={() => this.refresh()}
-            >
-              play again
-            </button>
-          </div>
-        )}
+        ) : null}
+        <div id="winner-message" className="winner-message hidden">
+          <h1 id="winner" className="winner">
+            {`${this.state.winner} has won!`}
+          </h1>
+          <button
+            id="play-again"
+            className="btn"
+            onClick={() => this.refresh()}
+          >
+            play again
+          </button>
+        </div>
       </div>
     );
   }
